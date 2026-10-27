@@ -352,81 +352,34 @@ const سطح_الأرض = new THREE.Mesh(
 سطح_الأرض.receiveShadow = true;
 العالم.add(سطح_الأرض);
 
-// المياه
+// برك مياه طبيعية
 const مادة_الماء = new THREE.MeshStandardMaterial({
-  color: 0x4daec5,
-  roughness: 0.25,
-  metalness: 0.05,
+  color: 0x397f83,
+  roughness: 0.2,
+  metalness: 0.08,
   transparent: true,
-  opacity: 0.88,
+  opacity: 0.94,
   side: THREE.DoubleSide
 });
 
-// نهر متعرج
-function إنشاء_نهر() {
+const مادة_الضفاف = new THREE.MeshStandardMaterial({
+  color: 0x8c8060,
+  roughness: 1,
+  side: THREE.DoubleSide
+});
+
+function إنشاء_بركة(x, z, عرض, طول, بذرة_البركة = 1) {
+  const عدد_النقاط = 64;
   const نقاط = [];
 
-  for (let i = 0; i <= 150; i++) {
-    const x = -النصف + i * (الحجم / 150);
-    const z = 18 * Math.sin(x * 0.025) +
-              5 * Math.sin(x * 0.071);
+  for (let i = 0; i < عدد_النقاط; i++) {
+    const زاوية = (i / عدد_النقاط) * Math.PI * 2;
 
-    نقاط.push(
-      new THREE.Vector3(x, ارتفاع(x, z) + 0.18, z)
-    );
-  }
-
-  const منحنى = new THREE.CatmullRomCurve3(نقاط);
-  const رؤوس = [];
-  const فهارس = [];
-  const خطوات = 420;
-
-  for (let i = 0; i <= خطوات; i++) {
-    const t = i / خطوات;
-    const نقطة = منحنى.getPoint(t);
-    const اتجاه = منحنى.getTangent(t);
-
-    const جانب = new THREE.Vector3(
-      -اتجاه.z, 0, اتجاه.x
-    ).normalize();
-
-    const عرض = 2.5 * (0.8 + 0.2 * Math.sin(t * 47));
-
-    رؤوس.push(
-      نقطة.x + جانب.x * عرض, نقطة.y, نقطة.z + جانب.z * عرض,
-      نقطة.x - جانب.x * عرض, نقطة.y, نقطة.z - جانب.z * عرض
-    );
-
-    if (i < خطوات) {
-      const a = i * 2;
-      فهارس.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-    }
-  }
-
-  const هندسة = new THREE.BufferGeometry();
-
-  هندسة.setAttribute(
-    "position",
-    new THREE.Float32BufferAttribute(رؤوس, 3)
-  );
-
-  هندسة.setIndex(فهارس);
-  هندسة.computeVertexNormals();
-
-  العالم.add(new THREE.Mesh(هندسة, مادة_الماء));
-}
-
-إنشاء_نهر();
-
-// بحيرات طبيعية
-function إنشاء_بحيرة(x, z, عرض, طول) {
-  const نقاط = [];
-
-  for (let i = 0; i < 48; i++) {
-    const زاوية = i / 48 * Math.PI * 2;
     const تعرج =
-      1 + 0.06 * Math.sin(زاوية * 5) +
-      0.035 * Math.cos(زاوية * 9);
+      1 +
+      0.09 * Math.sin(زاوية * 3 + بذرة_البركة) +
+      0.045 * Math.cos(زاوية * 5 + بذرة_البركة * 2) +
+      0.025 * Math.sin(زاوية * 8);
 
     نقاط.push(new THREE.Vector2(
       Math.cos(زاوية) * عرض * تعرج,
@@ -434,21 +387,8 @@ function إنشاء_بحيرة(x, z, عرض, طول) {
     ));
   }
 
-  const شكل = new THREE.Shape(نقاط);
-  const هندسة = new THREE.ShapeGeometry(شكل, 16);
-
-  هندسة.rotateX(-Math.PI / 2);
-
-  const بحيرة = new THREE.Mesh(هندسة, مادة_الماء);
-
-  بحيرة.position.set(x, ارتفاع(x, z) + 0.28, z);
-  العالم.add(بحيرة);
+  const شكل = new THREE.Shape(Nقاط);
 }
-
-إنشاء_بحيرة(-58, -42, 13, 8);
-إنشاء_بحيرة(38, 64, 11, 7);
-إنشاء_بحيرة(70, -53, 8, 5);
-
 // طرق ترابية واضحة
 const مادة_الطرق = new THREE.MeshStandardMaterial({
   color: 0x9b8058,
