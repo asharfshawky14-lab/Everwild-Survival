@@ -183,6 +183,8 @@ const THREE = await import(
   "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"
 );
 
+const { createCharacter } = await import("./الشخصية.js");
+
 const الحاوية = document.getElementById("العالم");
 const المشهد = new THREE.Scene();
 
@@ -601,6 +603,17 @@ function تحديث_الكاميرا() {
   الكاميرا.lookAt(الهدف);
 }
 
+// إنشاء لاعب Everwild وربطه بأرض العالم
+const اللاعب = createCharacter(THREE, المشهد, {
+  getGroundHeight: ارتفاع,
+  x: -25,
+  z: 35,
+  worldLimit: النصف - 8
+});
+
+// جعل الكاميرا تبدأ من مكان اللاعب
+الهدف.copy(اللاعب.position);
+الهدف.y += 1;
 تحديث_الكاميرا();
 
 const المؤشرات = new Map();
@@ -735,7 +748,18 @@ const الساعة = new THREE.Clock();
 
 function رسم() {
   requestAnimationFrame(رسم);
-  تحريك_الكاميرا(Math.min(الساعة.getDelta(), 0.05));
+
+  const dt = Math.min(الساعة.getDelta(), 0.05);
+
+  // تحديث حركة اللاعب
+  اللاعب.update(dt);
+
+  // إبقاء الكاميرا فوق اللاعب مع الاحتفاظ بالزاوية والتقريب
+  الهدف.copy(اللاعب.position);
+  الهدف.y += 1;
+
+  تحديث_الكاميرا();
+
   العارض.render(المشهد, الكاميرا);
 }
 
