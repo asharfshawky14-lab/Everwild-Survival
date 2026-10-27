@@ -425,65 +425,10 @@ controls.innerHTML = `
 
   updateStatusUI();
 
-  let pointerId = null;
-  let centerX = 0;
-  let centerY = 0;
-  const radius = 35;
+  
+  // واجهة الأزرار الجديدة تتولى العصا والجري والقفز.
+  // نحتفظ بلوحة المفاتيح الموجودة أسفل هذا الجزء.
 
-  function moveStick(event) {
-    const dx = event.clientX - centerX;
-    const dy = event.clientY - centerY;
-    const distance = Math.hypot(dx, dy);
-    const factor = distance > radius ? radius / distance : 1;
-    const x = dx * factor;
-    const y = dy * factor;
-
-    stick.style.left = `calc(50% + ${x}px)`;
-    stick.style.top = `calc(50% + ${y}px)`;
-    input.x = x / radius;
-    input.z = y / radius;
-  }
-
-  joystick.addEventListener("pointerdown", event => {
-    event.preventDefault();
-    pointerId = event.pointerId;
-    const rect = joystick.getBoundingClientRect();
-    centerX = rect.left + rect.width / 2;
-    centerY = rect.top + rect.height / 2;
-    joystick.setPointerCapture(event.pointerId);
-    moveStick(event);
-  });
-
-  function releaseStick(event) {
-    if (event.pointerId !== pointerId) return;
-    pointerId = null;
-    input.x = 0;
-    input.z = 0;
-    stick.style.left = "50%";
-    stick.style.top = "50%";
-  }
-
-  joystick.addEventListener("pointermove", event => {
-    if (event.pointerId === pointerId) moveStick(event);
-  });
-  joystick.addEventListener("pointerup", releaseStick);
-  joystick.addEventListener("pointercancel", releaseStick);
-
-  runButton.addEventListener("pointerdown", event => {
-    event.preventDefault();
-    input.run = true;
-  });
-  const stopRun = () => { input.run = false; };
-  runButton.addEventListener("pointerup", stopRun);
-  runButton.addEventListener("pointercancel", stopRun);
-  runButton.addEventListener("lostpointercapture", stopRun);
-
-  jumpButton.addEventListener("pointerdown", event => {
-    event.preventDefault();
-    input.jump = true;
-  });
-  jumpButton.addEventListener("pointerup", () => {});
-  jumpButton.addEventListener("pointercancel", () => {});
 
   // دعم الكمبيوتر أثناء التطوير
   const keys = new Set();
