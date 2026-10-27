@@ -243,6 +243,84 @@ export function createCharacter(THREE, scene, options = {}) {
       height: 70px;
       background: linear-gradient(145deg, #e7c46c, #a66b28);
     }
+        #ew-status {
+      position: fixed;
+      top: 88px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      pointer-events: none;
+      z-index: 21;
+    }
+
+    .ew-stat {
+      position: relative;
+      width: 43px;
+      height: 43px;
+      border-radius: 50%;
+      background: #101923c9;
+      border: 1px solid #ffffff35;
+      box-shadow: 0 3px 12px #0005;
+      display: grid;
+      place-items: center;
+    }
+
+    .ew-stat svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ew-stat circle {
+      fill: none;
+      stroke-width: 4;
+    }
+
+    .ew-stat .ew-track {
+      stroke: #ffffff20;
+    }
+
+    .ew-stat .ew-ring {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.2s linear;
+    }
+
+    .ew-stat-icon {
+      font-size: 19px;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px #000);
+    }
+
+    .ew-stat.low {
+      animation: ew-warning 1s ease-in-out infinite;
+    }
+
+    @keyframes ew-warning {
+      50% { box-shadow: 0 0 12px currentColor; }
+    }
+
+    @media (max-width: 380px) {
+      #ew-status {
+        top: 78px;
+        right: 8px;
+        gap: 7px;
+      }
+
+      .ew-stat {
+        width: 38px;
+        height: 38px;
+      }
+
+      .ew-stat-icon {
+        font-size: 17px;
+      }
+    }
+
     @media (hover:hover) and (pointer:fine) {
       #ew-controls { display:none; }
     }
@@ -258,10 +336,49 @@ export function createCharacter(THREE, scene, options = {}) {
 
   const controls = document.createElement("div");
   controls.id = "ew-controls";
-  controls.innerHTML = `
+    controls.innerHTML = `
+    <div id="ew-status">
+      <div class="ew-stat" data-stat="health" style="color:#ff4b55">
+        <svg viewBox="0 0 100 100">
+          <circle class="ew-track" cx="50" cy="50" r="44"/>
+          <circle class="ew-ring" cx="50" cy="50" r="44"
+            stroke="#ff4b55"/>
+        </svg>
+        <span class="ew-stat-icon">❤️</span>
+      </div>
+
+      <div class="ew-stat" data-stat="stamina" style="color:#8eea59">
+        <svg viewBox="0 0 100 100">
+          <circle class="ew-track" cx="50" cy="50" r="44"/>
+          <circle class="ew-ring" cx="50" cy="50" r="44"
+            stroke="#8eea59"/>
+        </svg>
+        <span class="ew-stat-icon">⚡</span>
+      </div>
+
+      <div class="ew-stat" data-stat="food" style="color:#ffad42">
+        <svg viewBox="0 0 100 100">
+          <circle class="ew-track" cx="50" cy="50" r="44"/>
+          <circle class="ew-ring" cx="50" cy="50" r="44"
+            stroke="#ffad42"/>
+        </svg>
+        <span class="ew-stat-icon">🍖</span>
+      </div>
+
+      <div class="ew-stat" data-stat="water" style="color:#43baff">
+        <svg viewBox="0 0 100 100">
+          <circle class="ew-track" cx="50" cy="50" r="44"/>
+          <circle class="ew-ring" cx="50" cy="50" r="44"
+            stroke="#43baff"/>
+        </svg>
+        <span class="ew-stat-icon">💧</span>
+      </div>
+    </div>
+
     <div id="ew-joystick" aria-label="عصا الحركة">
       <div id="ew-stick"></div>
     </div>
+
     <div id="ew-actions">
       <button id="ew-run" type="button" aria-label="جري">🏃</button>
       <button id="ew-jump" type="button" aria-label="نط">⬆️</button>
