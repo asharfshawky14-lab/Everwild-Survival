@@ -184,6 +184,9 @@ const THREE = await import(
 );
 
 const { createCharacter } = await import("./الشخصية.js");
+const { createGameControls } = await import("./الأزرار.js");
+
+const واجهة_التحكم = createGameControls();
 
 const الحاوية = document.getElementById("العالم");
 const المشهد = new THREE.Scene();
