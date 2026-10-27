@@ -177,6 +177,7 @@ button {
 
 <script type="module">
 try {
+  const شاشة_التحميل = document.getElementById("تحميل");
 
 const THREE = await import(
   "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"
@@ -740,11 +741,10 @@ function رسم() {
 
 رسم();
 
-loading.classList.add("hidden");
-setTimeout(() => loading.remove(), 400);
+شاشة_التحميل.remove();
 
 } catch (err) {
-  document.querySelector("#تحميل span").textContent =
+  document.querySelector("#تحميل p").textContent =
     "تعذّر تحميل محرك العالم ثلاثي الأبعاد.";
   const box = document.getElementById("خطأ");
   box.style.display = "block";
