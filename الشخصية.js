@@ -369,7 +369,7 @@ export function createCharacter(THREE, scene, options = {}) {
 
     const dt = Math.max(0, Math.min(deltaTime || 0, 0.05));
 
-    let x = input.x;
+        let x = input.x;
     let z = input.z;
 
     if (keys.has("a") || keys.has("arrowleft")) x -= 1;
@@ -388,8 +388,16 @@ export function createCharacter(THREE, scene, options = {}) {
     const speed = running ? runSpeed : walkSpeed;
 
     if (moving) {
-      root.position.x += x * speed * dt;
-      root.position.z += z * speed * dt;
+      const angle =
+        typeof options.getCameraAngle === "function"
+          ? options.getCameraAngle()
+          : 0;
+
+      const moveX = x * Math.cos(angle) + z * Math.sin(angle);
+      const moveZ = -x * Math.sin(angle) + z * Math.cos(angle);
+
+      root.position.x += moveX * speed * dt;
+      root.position.z += moveZ * speed * dt;
 
       root.position.x = THREE.MathUtils.clamp(
         root.position.x, -worldLimit, worldLimit
@@ -398,7 +406,14 @@ export function createCharacter(THREE, scene, options = {}) {
         root.position.z, -worldLimit, worldLimit
       );
 
-      root.rotation.y = Math.atan2(x, z);
+      const targetRotation = Math.atan2(moveX, moveZ);
+      const rotationDifference = Math.atan2(
+        Math.sin(targetRotation - root.rotation.y),
+        Math.cos(targetRotation - root.rotation.y)
+      );
+
+      root.rotation.y += rotationDifference * Math.min(1, dt * 10);
+
       walkTime += dt * (running ? 12 : 8);
     }
 
