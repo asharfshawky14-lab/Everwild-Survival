@@ -459,30 +459,42 @@ const مادة_الطرق = new THREE.MeshStandardMaterial({
 function إنشاء_طريق(النقاط, العرض = 2) {
   const منحنى = new THREE.CatmullRomCurve3(
     النقاط.map(([x, z]) =>
-      new THREE.Vector3(x, ارتفاع(x, z) + 0.09, z)
+      new THREE.Vector3(x, 0, z)
     )
   );
 
   const رؤوس = [];
   const فهارس = [];
-  const خطوات = 180;
+  const خطوات = 600;
+  const عينات_العرض = 12;
+  const هامش_الارتفاع = 0.035;
 
   for (let i = 0; i <= خطوات; i++) {
     const t = i / خطوات;
     const نقطة = منحنى.getPoint(t);
     const اتجاه = منحنى.getTangent(t);
-    const جانب = new THREE.Vector3(
-      -اتجاه.z, 0, اتجاه.x
-    ).normalize();
 
-    رؤوس.push(
-      نقطة.x + جانب.x * العرض, نقطة.y, نقطة.z + جانب.z * العرض,
-      نقطة.x - جانب.x * العرض, نقطة.y, نقطة.z - جانب.z * العرض
-    );
+    const طول_الاتجاه = Math.hypot(اتجاه.x, اتجاه.z) || 1;
+    const جانبX = -اتجاه.z / طول_الاتجاه;
+    const جانبZ = اتجاه.x / طول_الاتجاه;
 
-    if (i < خطوات) {
-      const a = i * 2;
-      فهارس.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    for (let j = 0; j <= عينات_العرض; j++) {
+      const نسبة = (j / عينات_العرض) * 2 - 1;
+      const x = نقطة.x + جانبX * العرض * نسبة;
+      const z = نقطة.z + جانبZ * العرض * نسبة;
+      const y = ارتفاع(x, z) + هامش_الارتفاع;
+
+      رؤوس.push(x, y, z);
+
+      if (i < خطوات && j < عينات_العرض) {
+        const a = i * (عينات_العرض + 1) + j;
+        const b = a + عينات_العرض + 1;
+
+        فهارس.push(
+          a, b, a + 1,
+          a + 1, b, b + 1
+        );
+      }
     }
   }
 
@@ -496,7 +508,9 @@ function إنشاء_طريق(النقاط, العرض = 2) {
   هندسة.setIndex(فهارس);
   هندسة.computeVertexNormals();
 
-  العالم.add(new THREE.Mesh(هندسة, مادة_الطرق));
+  const الطريق = new THREE.Mesh(هندسة, مادة_الطرق);
+  الطريق.receiveShadow = true;
+  العالم.add(الطريق);
 }
 
 إنشاء_طريق([
