@@ -612,6 +612,7 @@ if (!options.controls?.consumeJump) {
 
     window.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("keyup", onKeyUp);
+   options.controls?.dispose?.();
 
     controls.remove();
     style.remove();
