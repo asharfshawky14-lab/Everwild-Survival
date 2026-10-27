@@ -1,0 +1,759 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#101a22">
+<title>Everwild Survival - العالم</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #101a22;
+  font-family: Arial, sans-serif;
+}
+
+#العالم {
+  position: fixed;
+  inset: 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.الواجهة {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  left: 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.العنوان, .الأزرار, .التعليمات {
+  color: white;
+  background: rgba(14, 29, 33, .86);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 13px;
+  padding: 11px;
+  backdrop-filter: blur(8px);
+}
+
+.العنوان {
+  max-width: 70%;
+}
+
+.العنوان strong {
+  display: block;
+  font-size: 15px;
+  letter-spacing: .4px;
+}
+
+.العنوان small {
+  display: block;
+  margin-top: 5px;
+  color: #a9c9bd;
+  font-size: 11px;
+}
+
+.الأزرار {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 7px;
+}
+
+button {
+  border: 1px solid #58776b;
+  border-radius: 9px;
+  background: #29463c;
+  color: white;
+  padding: 9px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.التعليمات {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  text-align: center;
+  color: #d1e0d9;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+#تحميل {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: #101a22;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+#تحميل strong {
+  display: block;
+  font-size: 24px;
+}
+
+#تحميل p {
+  color: #b4c9bf;
+  font-size: 13px;
+}
+
+#خطأ {
+  color: #ffc2a9;
+  max-width: 320px;
+  font-size: 12px;
+}
+
+@media (min-width: 700px) {
+  .الأزرار {
+    flex-direction: row;
+  }
+
+  .العنوان strong {
+    font-size: 19px;
+  }
+
+  .التعليمات {
+    right: auto;
+    max-width: 440px;
+    text-align: right;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="العالم"></div>
+
+<div id="تحميل">
+  <div>
+    <strong>Everwild Survival</strong>
+    <p>بيتم تجهيز العالم...</p>
+    <div id="خطأ"></div>
+  </div>
+</div>
+
+<div class="الواجهة">
+  <div class="العنوان">
+    <strong>EVERWILD SURVIVAL</strong>
+    <small>عالم مفتوح ثلاثي الأبعاد</small>
+  </div>
+
+  <div class="الأزرار">
+    <button id="الليل">🌙 وضع الليل</button>
+    <button id="إعادة">↺ إعادة الكاميرا</button>
+  </div>
+</div>
+
+<div class="التعليمات">
+  اسحب بإصبعك لتغيير زاوية الرؤية.
+  استخدم إصبعين للتقريب والتبعيد.
+  على الكمبيوتر استخدم WASD أو الأسهم لتحريك الكاميرا.
+</div>
+
+<script type="module">
+try {
+
+const THREE = await import(
+  "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"
+);
+
+const الحاوية = document.getElementById("العالم");
+const المشهد = new THREE.Scene();
+
+المشهد.background = new THREE.Color(0x9bcbd5);
+المشهد.fog = new THREE.Fog(0x9bcbd5, 100, 245);
+
+const الكاميرا = new THREE.PerspectiveCamera(
+  48,
+  innerWidth / innerHeight,
+  0.1,
+  500
+);
+
+const العارض = new THREE.WebGLRenderer({
+  antialias: true,
+  powerPreference: "high-performance"
+});
+
+العارض.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+العارض.setSize(innerWidth, innerHeight);
+العارض.outputColorSpace = THREE.SRGBColorSpace;
+العارض.toneMapping = THREE.ACESFilmicToneMapping;
+العارض.toneMappingExposure = 1.05;
+
+العارض.shadowMap.enabled = true;
+العارض.shadowMap.type = THREE.PCFSoftShadowMap;
+
+الحاوية.appendChild(العارض.domElement);
+
+// الإضاءة
+const إضاءة_السماء = new THREE.HemisphereLight(
+  0xdaf1ff,
+  0x66704d,
+  2
+);
+
+المشهد.add(إضاءة_السماء);
+
+const الشمس = new THREE.DirectionalLight(0xfff0d2, 2.4);
+
+الشمس.position.set(-45, 75, 35);
+الشمس.castShadow = true;
+الشمس.shadow.mapSize.set(1024, 1024);
+الشمس.shadow.camera.left = -85;
+الشمس.shadow.camera.right = 85;
+الشمس.shadow.camera.top = 85;
+الشمس.shadow.camera.bottom = -85;
+
+المشهد.add(الشمس);
+
+const العالم = new THREE.Group();
+المشهد.add(العالم);
+
+// إعدادات العالم
+const الحجم = 240;
+const النصف = الحجم / 2;
+const التقسيمات = 140;
+
+function حصر(قيمة, أقل, أعلى) {
+  return Math.max(أقل, Math.min(أعلى, قيمة));
+}
+
+function تدرج(بداية, نهاية, قيمة) {
+  const t = حصر((قيمة - بداية) / (نهاية - بداية), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function ضوضاء(x, z) {
+  return (
+    Math.sin(x * 0.17 + Math.cos(z * 0.11) * 1.8) * 0.48 +
+    Math.sin(z * 0.23 - x * 0.07) * 0.28 +
+    Math.cos((x + z) * 0.09) * 0.24
+  );
+}
+
+// ارتفاع الأرض
+function ارتفاع(x, z) {
+  const تلال =
+    ضوضاء(x, z) * 2.2 +
+    Math.sin(x * 0.035) * 1.5 +
+    Math.cos(z * 0.04) * 1.25;
+
+  const قناع_الجبال = تدرج(
+    22, 58, x * 0.48 + z * 0.28
+  );
+
+  const قمم =
+    Math.max(0, Math.sin(x * 0.095 + z * 0.035) * 0.65 +
+    Math.cos(z * 0.13) * 0.35);
+
+  const جبال =
+    قناع_الجبال *
+    (4 + قمم * 12 + Math.max(0, ضوضاء(x + 20, z - 10)) * 5);
+
+  const قناع_الصحراء = تدرج(
+    12, 48, -x * 0.7 + z * 0.15
+  );
+
+  const رمال =
+    قناع_الصحراء *
+    Math.sin(z * 0.065 + Math.sin(x * 0.035) * 2) * 1.15;
+
+  return تلال + جبال + رمال;
+}
+
+// تحديد ألوان المناطق
+function المنطقة(x, z) {
+  return {
+    صحراء: تدرج(18, 55, -x * 0.72 + z * 0.18),
+    جبال: تدرج(28, 65, x * 0.48 + z * 0.28)
+  };
+}
+
+// إنشاء الأرض
+const هندسة_الأرض = new THREE.PlaneGeometry(
+  الحجم, الحجم, التقسيمات, التقسيمات
+);
+
+هندسة_الأرض.rotateX(-Math.PI / 2);
+
+const مواقع = هندسة_الأرض.attributes.position;
+const ألوان = [];
+
+const أخضر = new THREE.Color(0x709d56);
+const عشب_فاتح = new THREE.Color(0x8cba6c);
+const رمل = new THREE.Color(0xd8bf80);
+const صخر = new THREE.Color(0x85877e);
+
+for (let i = 0; i < مواقع.count; i++) {
+  const x = مواقع.getX(i);
+  const z = مواقع.getZ(i);
+  const y = ارتفاع(x, z);
+
+  مواقع.setY(i, y);
+
+  const نوع = المنطقة(x, z);
+
+  let لون = أخضر.clone().lerp(
+    عشب_فاتح,
+    حصر((ضوضاء(x + 8, z + 4) + 0.8) * 0.28, 0, 0.55)
+  );
+
+  لون.lerp(رمل, نوع.صحراء * 0.92);
+  لون.lerp(صخر, نوع.جبال * 0.78);
+
+  ألوان.push(لون.r, لون.g, لون.b);
+}
+
+هندسة_الأرض.setAttribute(
+  "color",
+  new THREE.Float32BufferAttribute(ألوان, 3)
+);
+
+هندسة_الأرض.computeVertexNormals();
+
+const سطح_الأرض = new THREE.Mesh(
+  هندسة_الأرض,
+  new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 1,
+    metalness: 0
+  })
+);
+
+سطح_الأرض.receiveShadow = true;
+العالم.add(سطح_الأرض);
+
+// المياه
+const مادة_الماء = new THREE.MeshStandardMaterial({
+  color: 0x4daec5,
+  roughness: 0.25,
+  metalness: 0.05,
+  transparent: true,
+  opacity: 0.88,
+  side: THREE.DoubleSide
+});
+
+// نهر متعرج
+function إنشاء_نهر() {
+  const نقاط = [];
+
+  for (let i = 0; i <= 150; i++) {
+    const x = -النصف + i * (الحجم / 150);
+    const z = 18 * Math.sin(x * 0.025) +
+              5 * Math.sin(x * 0.071);
+
+    نقاط.push(
+      new THREE.Vector3(x, ارتفاع(x, z) + 0.18, z)
+    );
+  }
+
+  const منحنى = new THREE.CatmullRomCurve3(نقاط);
+  const رؤوس = [];
+  const فهارس = [];
+  const خطوات = 420;
+
+  for (let i = 0; i <= خطوات; i++) {
+    const t = i / خطوات;
+    const نقطة = منحنى.getPoint(t);
+    const اتجاه = منحنى.getTangent(t);
+
+    const جانب = new THREE.Vector3(
+      -اتجاه.z, 0, اتجاه.x
+    ).normalize();
+
+    const عرض = 2.5 * (0.8 + 0.2 * Math.sin(t * 47));
+
+    رؤوس.push(
+      نقطة.x + جانب.x * عرض, نقطة.y, نقطة.z + جانب.z * عرض,
+      نقطة.x - جانب.x * عرض, نقطة.y, نقطة.z - جانب.z * عرض
+    );
+
+    if (i < خطوات) {
+      const a = i * 2;
+      فهارس.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    }
+  }
+
+  const هندسة = new THREE.BufferGeometry();
+
+  هندسة.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(رؤوس, 3)
+  );
+
+  هندسة.setIndex(فهارس);
+  هندسة.computeVertexNormals();
+
+  العالم.add(new THREE.Mesh(هندسة, مادة_الماء));
+}
+
+إنشاء_نهر();
+
+// بحيرات طبيعية
+function إنشاء_بحيرة(x, z, عرض, طول) {
+  const نقاط = [];
+
+  for (let i = 0; i < 48; i++) {
+    const زاوية = i / 48 * Math.PI * 2;
+    const تعرج =
+      1 + 0.06 * Math.sin(زاوية * 5) +
+      0.035 * Math.cos(زاوية * 9);
+
+    نقاط.push(new THREE.Vector2(
+      Math.cos(زاوية) * عرض * تعرج,
+      Math.sin(زاوية) * طول * تعرج
+    ));
+  }
+
+  const شكل = new THREE.Shape(نقاط);
+  const هندسة = new THREE.ShapeGeometry(شكل, 16);
+
+  هندسة.rotateX(-Math.PI / 2);
+
+  const بحيرة = new THREE.Mesh(هندسة, مادة_الماء);
+
+  بحيرة.position.set(x, ارتفاع(x, z) + 0.28, z);
+  العالم.add(بحيرة);
+}
+
+إنشاء_بحيرة(-58, -42, 13, 8);
+إنشاء_بحيرة(38, 64, 11, 7);
+إنشاء_بحيرة(70, -53, 8, 5);
+
+// طرق ترابية واضحة
+const مادة_الطرق = new THREE.MeshStandardMaterial({
+  color: 0x9b8058,
+  roughness: 1,
+  side: THREE.DoubleSide
+});
+
+function إنشاء_طريق(النقاط, العرض = 2) {
+  const منحنى = new THREE.CatmullRomCurve3(
+    النقاط.map(([x, z]) =>
+      new THREE.Vector3(x, ارتفاع(x, z) + 0.09, z)
+    )
+  );
+
+  const رؤوس = [];
+  const فهارس = [];
+  const خطوات = 180;
+
+  for (let i = 0; i <= خطوات; i++) {
+    const t = i / خطوات;
+    const نقطة = منحنى.getPoint(t);
+    const اتجاه = منحنى.getTangent(t);
+    const جانب = new THREE.Vector3(
+      -اتجاه.z, 0, اتجاه.x
+    ).normalize();
+
+    رؤوس.push(
+      نقطة.x + جانب.x * العرض, نقطة.y, نقطة.z + جانب.z * العرض,
+      نقطة.x - جانب.x * العرض, نقطة.y, نقطة.z - جانب.z * العرض
+    );
+
+    if (i < خطوات) {
+      const a = i * 2;
+      فهارس.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    }
+  }
+
+  const هندسة = new THREE.BufferGeometry();
+
+  هندسة.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(رؤوس, 3)
+  );
+
+  هندسة.setIndex(فهارس);
+  هندسة.computeVertexNormals();
+
+  العالم.add(new THREE.Mesh(هندسة, مادة_الطرق));
+}
+
+إنشاء_طريق([
+  [-115, -70], [-80, -50], [-50, -22], [-20, -8],
+  [12, 4], [40, 28], [72, 52], [110, 70]
+], 2.2);
+
+إنشاء_طريق([
+  [-75, 110], [-58, 80], [-34, 55], [-18, 25],
+  [5, 5], [30, -18], [52, -45], [78, -80], [112, -108]
+], 1.8);
+
+إنشاء_طريق([
+  [-118, 15], [-86, 18], [-55, 25], [-26, 22],
+  [0, 16], [28, 12], [54, 2], [86, -4], [115, -18]
+], 1.6);
+
+// أشجار ديكورية فقط؛ ليست موارد قابلة للجمع
+const جذع_الشجرة = new THREE.CylinderGeometry(0.22, 0.34, 2.2, 5);
+const تاج_الشجرة = new THREE.ConeGeometry(1.45, 3.6, 6);
+
+const مادة_الجذع = new THREE.MeshStandardMaterial({
+  color: 0x76523a,
+  roughness: 1
+});
+
+const مواد_الأوراق = [
+  new THREE.MeshStandardMaterial({ color: 0x386f45, roughness: 1, flatShading: true }),
+  new THREE.MeshStandardMaterial({ color: 0x4d874e, roughness: 1, flatShading: true }),
+  new THREE.MeshStandardMaterial({ color: 0x609653, roughness: 1, flatShading: true })
+];
+
+const الأشجار = new THREE.Group();
+العالم.add(الأشجار);
+
+let بذرة = 78231;
+
+function عشوائي() {
+  بذرة = (بذرة * 1664525 + 1013904223) >>> 0;
+  return بذرة / 4294967296;
+}
+
+for (let i = 0; i < 210; i++) {
+  const x = (عشوائي() - 0.5) * الحجم;
+  const z = (عشوائي() - 0.5) * الحجم;
+  const نوع = المنطقة(x, z);
+
+  const نهرZ = 18 * Math.sin(x * 0.025) +
+               5 * Math.sin(x * 0.071);
+
+  if (
+    نوع.صحراء > 0.58 ||
+    نوع.جبال > 0.78 ||
+    Math.abs(z - نهرZ) < 7 ||
+    عشوائي() > 0.76
+  ) continue;
+
+  const h = ارتفاع(x, z);
+  const شجرة = new THREE.Group();
+
+  const جذع = new THREE.Mesh(جذع_الشجرة, مادة_الجذع);
+  جذع.position.y = 1.1;
+  جذع.castShadow = true;
+  شجرة.add(جذع);
+
+  const تاج = new THREE.Mesh(
+    تاج_الشجرة,
+    مواد_الأوراق[Math.floor(عشوائي() * مواد_الأوراق.length)]
+  );
+
+  تاج.position.y = 3.1;
+  تاج.scale.set(
+    0.8 + عشوائي() * 0.4,
+    0.8 + عشوائي() * 0.45,
+    0.8 + عشوائي() * 0.4
+  );
+
+  تاج.castShadow = true;
+  شجرة.add(تاج);
+
+  شجرة.scale.setScalar(0.65 + عشوائي() * 0.75);
+  شجرة.position.set(x, h, z);
+  شجرة.rotation.y = عشوائي() * Math.PI * 2;
+
+  الأشجار.add(شجرة);
+}
+
+// كاميرا مرتفعة ومائلة
+const الهدف = new THREE.Vector3(0, ارتفاع(0, 0), 0);
+
+let المسافة = 62;
+let الزاوية = -0.58;
+let الميل = 0.78;
+
+function تحديث_الكاميرا() {
+  const أفقي = المسافة * Math.cos(الميل);
+
+  الكاميرا.position.set(
+    الهدف.x + Math.sin(الزاوية) * أفقي,
+    الهدف.y + المسافة * Math.sin(الميل),
+    الهدف.z + Math.cos(الزاوية) * أفقي
+  );
+
+  الكاميرا.lookAt(الهدف);
+}
+
+تحديث_الكاميرا();
+
+const المؤشرات = new Map();
+let آخر_مسافة_بين_الأصابع = 0;
+
+العارض.domElement.addEventListener("pointerdown", e => {
+  العارض.domElement.setPointerCapture(e.pointerId);
+  المؤشرات.set(e.pointerId, { x: e.clientX, y: e.clientY });
+});
+
+العارض.domElement.addEventListener("pointermove", e => {
+  if (!المؤشرات.has(e.pointerId)) return;
+
+  const السابق = المؤشرات.get(e.pointerId);
+  const dx = e.clientX - السابق.x;
+  const dy = e.clientY - السابق.y;
+
+  المؤشرات.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  if (المؤشرات.size === 1) {
+    الزاوية -= dx * 0.005;
+    الميل = حصر(الميل + dy * 0.003, 0.38, 1.18);
+  } else if (المؤشرات.size >= 2) {
+    const النقط = [...المؤشرات.values()];
+    const d = Math.hypot(
+      النقط[0].x - النقط[1].x,
+      النقط[0].y - النقط[1].y
+    );
+
+    if (آخر_مسافة_بين_الأصابع) {
+      المسافة = حصر(
+        المسافة - (d - آخر_مسافة_بين_الأصابع) * 0.12,
+        28, 105
+      );
+    }
+
+    آخر_مسافة_بين_الأصابع = d;
+  }
+
+  تحديث_الكاميرا();
+});
+
+function رفع_الإصبع(e) {
+  المؤشرات.delete(e.pointerId);
+  if (المؤشرات.size < 2) آخر_مسافة_بين_الأصابع = 0;
+}
+
+العارض.domElement.addEventListener("pointerup", رفع_الإصبع);
+العارض.domElement.addEventListener("pointercancel", رفع_الإصبع);
+
+العارض.domElement.addEventListener("wheel", e => {
+  المسافة = حصر(المسافة + e.deltaY * 0.045, 28, 105);
+  تحديث_الكاميرا();
+}, { passive: true });
+
+// تحريك نقطة نظر الكاميرا من لوحة المفاتيح
+const المفاتيح = new Set();
+
+addEventListener("keydown", e => المفاتيح.add(e.key.toLowerCase()));
+addEventListener("keyup", e => المفاتيح.delete(e.key.toLowerCase()));
+
+function تحريك_الكاميرا(dt) {
+  let x = 0, z = 0;
+
+  if (المفاتيح.has("w") || المفاتيح.has("arrowup")) z -= 1;
+  if (المفاتيح.has("s") || المفاتيح.has("arrowdown")) z += 1;
+  if (المفاتيح.has("a") || المفاتيح.has("arrowleft")) x -= 1;
+  if (المفاتيح.has("d") || المفاتيح.has("arrowright")) x += 1;
+
+  if (!x && !z) return;
+
+  const السرعة = dt * 22 * (المسافة / 62);
+  const أمام = new THREE.Vector3(-Math.sin(الزاوية), 0, -Math.cos(الزاوية));
+  const يمين = new THREE.Vector3(Math.cos(الزاوية), 0, -Math.sin(الزاوية));
+
+  الهدف.addScaledVector(أمام, z * السرعة);
+  الهدف.addScaledVector(يمين, x * السرعة);
+
+  الهدف.x = حصر(الهدف.x, -النصف + 8, النصف - 8);
+  الهدف.z = حصر(الهدف.z, -النصف + 8, النصف - 8);
+  الهدف.y = ارتفاع(الهدف.x, الهدف.z);
+
+  تحديث_الكاميرا();
+}
+
+// تبديل الإضاءة بين النهار والليل
+let ليل = false;
+
+document.getElementById("الليل").addEventListener("click", () => {
+  ليل = !ليل;
+
+  if (ليل) {
+    المشهد.background.set(0x101d35);
+    المشهد.fog.color.set(0x101d35);
+    إضاءة_السماء.color.set(0x7892c4);
+    إضاءة_السماء.groundColor.set(0x28303a);
+    إضاءة_السماء.intensity = 0.8;
+    الشمس.color.set(0x9bbcff);
+    الشمس.intensity = 0.55;
+    العارض.toneMappingExposure = 0.82;
+    document.getElementById("الليل").textContent = "☀️ وضع النهار";
+  } else {
+    المشهد.background.set(0x9bc8d3);
+    المشهد.fog.color.set(0x9bc8d3);
+    إضاءة_السماء.color.set(0xdaf1ff);
+    إضاءة_السماء.groundColor.set(0x66704d);
+    إضاءة_السماء.intensity = 2;
+    الشمس.color.set(0xfff0d2);
+    الشمس.intensity = 2.4;
+    العارض.toneMappingExposure = 1.05;
+    document.getElementById("الليل").textContent = "🌙 وضع الليل";
+  }
+});
+
+document.getElementById("إعادة").addEventListener("click", () => {
+  الهدف.set(0, ارتفاع(0, 0), 0);
+  المسافة = 62;
+  الزاوية = -0.58;
+  الميل = 0.78;
+  تحديث_الكاميرا();
+});
+
+// استجابة لحجم الشاشة
+addEventListener("resize", () => {
+  الكاميرا.aspect = innerWidth / innerHeight;
+  الكاميرا.updateProjectionMatrix();
+  العارض.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+  العارض.setSize(innerWidth, innerHeight);
+});
+
+const الساعة = new THREE.Clock();
+
+function رسم() {
+  requestAnimationFrame(رسم);
+  تحريك_الكاميرا(Math.min(الساعة.getDelta(), 0.05));
+  العارض.render(المشهد, الكاميرا);
+}
+
+رسم();
+
+loading.classList.add("hidden");
+setTimeout(() => loading.remove(), 400);
+
+} catch (err) {
+  document.querySelector("#تحميل span").textContent =
+    "تعذّر تحميل محرك العالم ثلاثي الأبعاد.";
+  const box = document.getElementById("خطأ");
+  box.style.display = "block";
+  box.textContent =
+    "تأكد من اتصال الإنترنت وافتح الملف في متصفح حديث يدعم WebGL. " +
+    (err && err.message ? err.message : "");
+  console.error(err);
+}
+</script>
+
+</body>
+</html>
