@@ -536,8 +536,35 @@ export function createCharacter(THREE, scene, options = {}) {
       z /= length;
     }
 
-    const moving = Math.hypot(x, z) > 0.08;
-    const running = input.run || keys.has("shift");
+        const moving = Math.hypot(x, z) > 0.08;
+    const wantsRun = input.run || keys.has("shift");
+
+    if (statusValues.stamina <= 0) {
+      statusValues.stamina = 0;
+      sprintLocked = true;
+    }
+
+    if (sprintLocked && statusValues.stamina >= 25) {
+      sprintLocked = false;
+    }
+
+    const running = moving && wantsRun &&
+      !sprintLocked && statusValues.stamina > 0;
+
+    if (running) {
+      statusValues.stamina = Math.max(
+        0, statusValues.stamina - dt * 10
+      );
+
+      if (statusValues.stamina <= 0) {
+        sprintLocked = true;
+      }
+    } else if (!moving) {
+      statusValues.stamina = Math.min(
+        100, statusValues.stamina + dt * 20
+      );
+    }
+
     const speed = running ? runSpeed : walkSpeed;
 
     if (moving) {
@@ -570,6 +597,15 @@ export function createCharacter(THREE, scene, options = {}) {
       walkTime += dt * (running ? 12 : 8);
     }
 
+    survivalTime += dt;
+
+    if (survivalTime >= 60) {
+      survivalTime = 0;
+      statusValues.food = Math.max(0, statusValues.food - 1);
+      statusValues.water = Math.max(0, statusValues.water - 1.5);
+    }
+
+    updateStatusUI();
     const groundY = getGroundHeight(root.position.x, root.position.z);
 
     if (input.jump && grounded) {
