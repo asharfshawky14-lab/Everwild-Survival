@@ -418,7 +418,13 @@ export function createCharacter(THREE, scene, options = {}) {
       const item = statusElements[name];
       const amount = THREE.MathUtils.clamp(value, 0, 100);
 
-      item.ring.style.strokeDashoffset = String(100 - amount);
+            const circumference = 2 * Math.PI * 44;
+
+      item.ring.style.strokeDasharray = String(circumference);
+      item.ring.style.strokeDashoffset = String(
+        circumference * (1 - amount / 100)
+      );
+
       item.element.classList.toggle("low", amount <= 25);
     }
   }
