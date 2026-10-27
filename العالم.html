@@ -169,8 +169,8 @@ button {
   </div>
 
   <div class="الأزرار">
-    <button id="الليل" aria-label="وضع الليل" title="وضع الليل">🌙</button>
-<button id="إعادة" aria-label="إعادة الكاميرا" title="إعادة الكاميرا">↺</button>
+    <button id="الليل" aria-label="وضع الليل" title="">🌙</button>
+<button id="إعادة" aria-label="إعادة الكاميرا" title="">↺</button>
   </div>
 </div>
 
@@ -684,7 +684,6 @@ document.getElementById("الليل").addEventListener("click", () => {
     الشمس.color.set(0x9bbcff);
     الشمس.intensity = 0.55;
     العارض.toneMappingExposure = 0.82;
-    document.getElementById("الليل").textContent = "☀️ وضع النهار";
   } else {
     المشهد.background.set(0x9bc8d3);
     المشهد.fog.color.set(0x9bc8d3);
@@ -694,7 +693,7 @@ document.getElementById("الليل").addEventListener("click", () => {
     الشمس.color.set(0xfff0d2);
     الشمس.intensity = 2.4;
     العارض.toneMappingExposure = 1.05;
-    document.getElementById("الليل").textContent = "🌙 وضع الليل";
+    
   }
 });
 
