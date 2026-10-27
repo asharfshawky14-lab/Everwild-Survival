@@ -414,104 +414,41 @@ const سطح_الأرض = new THREE.Mesh(
 العالم.add(سطح_الأرض);
 
 
- // برك مياه طبيعية
-const مادة_الماء = new THREE.MeshStandardMaterial({
-  color: 0x397f83,
-  roughness: 0.22,
-  metalness: 0.06,
-  transparent: true,
-  opacity: 0.94,
-  side: THREE.DoubleSide,
-  depthWrite: true
-});
 
-const مادة_الضفاف = new THREE.MeshStandardMaterial({
-  color: 0x8c8060,
-  roughness: 1,
+ // مياه برك طبيعية
+const مادة_الماء = new THREE.MeshPhysicalMaterial({
+  color: 0x477f76,
+  roughness: 0.2,
+  metalness: 0,
+  clearcoat: 0.65,
+  clearcoatRoughness: 0.16,
   side: THREE.DoubleSide
 });
 
 function إنشاء_بركة(بركة) {
-  const { x, z, عرض, طول, عمق } = بركة;
-  const عدد_النقاط = 64;
-  const حلقات_الضفاف = 5;
-  const رؤوس_الضفاف = [];
-  const فهارس_الضفاف = [];
-  const نقاط_الماء = [];
+  const { x, z, عرض, طول, مستوى_الماء } = بركة;
+  const عدد_النقاط = 96;
+  const نقاط_الشكل = [];
 
   for (let i = 0; i < عدد_النقاط; i++) {
     const زاوية = (i / عدد_النقاط) * Math.PI * 2;
 
     const تعرج =
       1 +
-      0.09 * Math.sin(زاوية * 3 + x * 0.1) +
+      0.075 * Math.sin(زاوية * 3 + x * 0.1) +
       0.045 * Math.cos(زاوية * 5 + z * 0.1) +
-      0.025 * Math.sin(زاوية * 8);
+      0.025 * Math.sin(زاوية * 8 + x * 0.03);
 
-    نقاط_الماء.push({
-      زاوية,
-      تعرج
-    });
-  }
-
-  // حلقة ضفاف تتبع ارتفاع الأرض
-  for (let ring = 0; ring <= حلقات_الضفاف; ring++) {
-    const نسبة = 0.78 + (ring / حلقات_الضفاف) * 0.42;
-
-    for (let i = 0; i < عدد_النقاط; i++) {
-      const نقطة = نقاط_الماء[i];
-      const px =
-        x + Math.cos(نقطة.زاوية) * عرض * نقطة.تعرج * نسبة;
-      const pz =
-        z + Math.sin(نقطة.زاوية) * طول * نقطة.تعرج * نسبة;
-
-      const py = ارتفاع(px, pz) + 0.025;
-
-      رؤوس_الضفاف.push(px, py, pz);
-    }
-  }
-
-  for (let ring = 0; ring < حلقات_الضفاف; ring++) {
-    for (let i = 0; i < عدد_النقاط; i++) {
-      const next = (i + 1) % عدد_النقاط;
-      const a = ring * عدد_النقاط + i;
-      const b = ring * عدد_النقاط + next;
-      const c = (ring + 1) * عدد_النقاط + i;
-      const d = (ring + 1) * عدد_النقاط + next;
-
-      فهارس_الضفاف.push(a, c, b, b, c, d);
-    }
-  }
-
-  const هندسة_الضفاف = new THREE.BufferGeometry();
-  هندسة_الضفاف.setAttribute(
-    "position",
-    new THREE.Float32BufferAttribute(رؤوس_الضفاف, 3)
-  );
-  هندسة_الضفاف.setIndex(فهارس_الضفاف);
-  هندسة_الضفاف.computeVertexNormals();
-
-  const الضفاف = new THREE.Mesh(
-    هندسة_الضفاف,
-    مادة_الضفاف
-  );
-  الضفاف.receiveShadow = true;
-  العالم.add(الضفاف);
-
-  // سطح ماء داخلي منخفض
-  const نقاط_الشكل = [];
-
-  for (const نقطة of نقاط_الماء) {
     نقاط_الشكل.push(
       new THREE.Vector2(
-        Math.cos(نقطة.زاوية) * عرض * نقطة.تعرج * 0.78,
-        Math.sin(نقطة.زاوية) * طول * نقطة.تعرج * 0.78
+        Math.cos(زاوية) * عرض * 0.72 * تعرج,
+        Math.sin(زاوية) * طول * 0.72 * تعرج
       )
     );
   }
 
-  const الشكل = new THREE.Shape(نقاط_الشكل);
-  const هندسة_الماء = new THREE.ShapeGeometry(الشكل, 12);
+  const الشكل = new THREE.Shape(Nقاط_الشكل);
+  const هندسة_الماء = new THREE.ShapeGeometry(الشكل, 16);
   هندسة_الماء.rotateX(-Math.PI / 2);
 
   const سطح_الماء = new THREE.Mesh(
@@ -519,12 +456,8 @@ function إنشاء_بركة(بركة) {
     مادة_الماء
   );
 
-  سطح_الماء.position.set(
-    x,
-    ارتفاع_أساسي(x, z) - عمق + 0.08,
-    z
-  );
-
+  سطح_الماء.position.set(x, مستوى_الماء, z);
+  سطح_الماء.renderOrder = 2;
   العالم.add(سطح_الماء);
 }
 
