@@ -375,10 +375,6 @@ controls.innerHTML = `
 
   document.body.appendChild(controls);
 
-  const joystick = controls.querySelector("#ew-joystick");
-  const stick = controls.querySelector("#ew-stick");
-  const runButton = controls.querySelector("#ew-run");
-  const jumpButton = controls.querySelector("#ew-jump");
 
     const input = options.controls?.input ?? {
   x: 0,
