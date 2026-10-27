@@ -549,11 +549,18 @@ controls.innerHTML = `
     updateStatusUI();
     const groundY = getGroundHeight(root.position.x, root.position.z);
 
-    if (input.jump && grounded) {
-      verticalVelocity = jumpSpeed;
-      grounded = false;
-    }
-    input.jump = false;
+    const jumpPressed = options.controls?.consumeJump
+  ? options.controls.consumeJump()
+  : input.jump;
+
+if (jumpPressed && grounded) {
+  verticalVelocity = jumpSpeed;
+  grounded = false;
+}
+
+if (!options.controls?.consumeJump) {
+  input.jump = false;
+}
 
     if (!grounded) {
       verticalVelocity -= gravity * dt;
