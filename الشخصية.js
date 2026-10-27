@@ -391,7 +391,40 @@ export function createCharacter(THREE, scene, options = {}) {
   const runButton = controls.querySelector("#ew-run");
   const jumpButton = controls.querySelector("#ew-jump");
 
-  const input = { x: 0, z: 0, run: false, jump: false };
+    const input = { x: 0, z: 0, run: false, jump: false };
+
+  const statusValues = {
+    health: 100,
+    stamina: 100,
+    food: 100,
+    water: 100
+  };
+
+  const statusElements = {};
+
+  for (const name of Object.keys(statusValues)) {
+    const element = controls.querySelector(
+      `[data-stat="${name}"]`
+    );
+
+    statusElements[name] = {
+      element,
+      ring: element.querySelector(".ew-ring")
+    };
+  }
+
+  function updateStatusUI() {
+    for (const [name, value] of Object.entries(statusValues)) {
+      const item = statusElements[name];
+      const amount = THREE.MathUtils.clamp(value, 0, 100);
+
+      item.ring.style.strokeDashoffset = String(100 - amount);
+      item.element.classList.toggle("low", amount <= 25);
+    }
+  }
+
+  updateStatusUI();
+
   let pointerId = null;
   let centerX = 0;
   let centerY = 0;
@@ -476,17 +509,20 @@ export function createCharacter(THREE, scene, options = {}) {
   let walkTime = 0;
   let disposed = false;
 
-  const walkSpeed = 3.1;
-  const runSpeed = 5.5;
+    const walkSpeed = 3.1;
+  const runSpeed = 8.25;
   const jumpSpeed = 5.2;
   const gravity = 14.5;
+
+  let sprintLocked = false;
+  let survivalTime = 0;
 
   function update(deltaTime) {
     if (disposed) return null;
 
     const dt = Math.max(0, Math.min(deltaTime || 0, 0.05));
 
-            let x = input.x;
+    let x = input.x;
     let z = input.z;
 
     if (keys.has("a") || keys.has("arrowleft")) x -= 1;
