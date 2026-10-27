@@ -606,6 +606,7 @@ function تحديث_الكاميرا() {
 // إنشاء لاعب Everwild وربطه بأرض العالم
 const اللاعب = createCharacter(THREE, المشهد, {
   getGroundHeight: ارتفاع,
+  getCameraAngle: () => الزاوية,
   x: -25,
   z: 35,
   worldLimit: النصف - 8
