@@ -391,7 +391,12 @@ export function createCharacter(THREE, scene, options = {}) {
   const runButton = controls.querySelector("#ew-run");
   const jumpButton = controls.querySelector("#ew-jump");
 
-    const input = { x: 0, z: 0, run: false, jump: false };
+    const input = options.controls?.input ?? {
+  x: 0,
+  z: 0,
+  run: false,
+  jump: false
+};
 
   const statusValues = {
     health: 100,
