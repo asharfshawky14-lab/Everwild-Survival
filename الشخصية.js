@@ -336,54 +336,43 @@ export function createCharacter(THREE, scene, options = {}) {
 
   const controls = document.createElement("div");
   controls.id = "ew-controls";
-    controls.innerHTML = `
-    <div id="ew-status">
-      <div class="ew-stat" data-stat="health" style="color:#ff4b55">
-        <svg viewBox="0 0 100 100">
-          <circle class="ew-track" cx="50" cy="50" r="44"/>
-          <circle class="ew-ring" cx="50" cy="50" r="44"
-            stroke="#ff4b55"/>
-        </svg>
-        <span class="ew-stat-icon">❤️</span>
-      </div>
-
-      <div class="ew-stat" data-stat="stamina" style="color:#8eea59">
-        <svg viewBox="0 0 100 100">
-          <circle class="ew-track" cx="50" cy="50" r="44"/>
-          <circle class="ew-ring" cx="50" cy="50" r="44"
-            stroke="#8eea59"/>
-        </svg>
-        <span class="ew-stat-icon">⚡</span>
-      </div>
-
-      <div class="ew-stat" data-stat="food" style="color:#ffad42">
-        <svg viewBox="0 0 100 100">
-          <circle class="ew-track" cx="50" cy="50" r="44"/>
-          <circle class="ew-ring" cx="50" cy="50" r="44"
-            stroke="#ffad42"/>
-        </svg>
-        <span class="ew-stat-icon">🍖</span>
-      </div>
-
-      <div class="ew-stat" data-stat="water" style="color:#43baff">
-        <svg viewBox="0 0 100 100">
-          <circle class="ew-track" cx="50" cy="50" r="44"/>
-          <circle class="ew-ring" cx="50" cy="50" r="44"
-            stroke="#43baff"/>
-        </svg>
-        <span class="ew-stat-icon">💧</span>
-      </div>
+    
+controls.innerHTML = `
+  <div id="ew-status">
+    <div class="ew-stat" data-stat="health" style="color:#ff4b55">
+      <svg viewBox="0 0 100 100">
+        <circle class="ew-track" cx="50" cy="50" r="44"/>
+        <circle class="ew-ring" cx="50" cy="50" r="44" stroke="#ff4b55"/>
+      </svg>
+      <span class="ew-stat-icon">❤️</span>
     </div>
 
-    <div id="ew-joystick" aria-label="عصا الحركة">
-      <div id="ew-stick"></div>
+    <div class="ew-stat" data-stat="stamina" style="color:#8eea59">
+      <svg viewBox="0 0 100 100">
+        <circle class="ew-track" cx="50" cy="50" r="44"/>
+        <circle class="ew-ring" cx="50" cy="50" r="44" stroke="#8eea59"/>
+      </svg>
+      <span class="ew-stat-icon">⚡</span>
     </div>
 
-    <div id="ew-actions">
-      <button id="ew-run" type="button" aria-label="جري">🏃</button>
-      <button id="ew-jump" type="button" aria-label="نط">⬆️</button>
+    <div class="ew-stat" data-stat="food" style="color:#ffad42">
+      <svg viewBox="0 0 100 100">
+        <circle class="ew-track" cx="50" cy="50" r="44"/>
+        <circle class="ew-ring" cx="50" cy="50" r="44" stroke="#ffad42"/>
+      </svg>
+      <span class="ew-stat-icon">🍖</span>
     </div>
-  `;
+
+    <div class="ew-stat" data-stat="water" style="color:#43baff">
+      <svg viewBox="0 0 100 100">
+        <circle class="ew-track" cx="50" cy="50" r="44"/>
+        <circle class="ew-ring" cx="50" cy="50" r="44" stroke="#43baff"/>
+      </svg>
+      <span class="ew-stat-icon">💧</span>
+    </div>
+  </div>
+`;
+
   document.body.appendChild(controls);
 
   const joystick = controls.querySelector("#ew-joystick");
