@@ -369,7 +369,7 @@ export function createCharacter(THREE, scene, options = {}) {
 
     const dt = Math.max(0, Math.min(deltaTime || 0, 0.05));
 
-        let x = input.x;
+            let x = input.x;
     let z = input.z;
 
     if (keys.has("a") || keys.has("arrowleft")) x -= 1;
