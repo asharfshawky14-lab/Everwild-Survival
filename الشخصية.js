@@ -244,15 +244,15 @@ export function createCharacter(THREE, scene, options = {}) {
       background: linear-gradient(145deg, #e7c46c, #a66b28);
     }
         #ew-status {
-      position: fixed;
-      top: 88px;
-      right: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      pointer-events: none;
-      z-index: 21;
-    }
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top));
+  right: 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 21;
+}
 
     .ew-stat {
       position: relative;
@@ -305,21 +305,21 @@ export function createCharacter(THREE, scene, options = {}) {
     }
 
     @media (max-width: 380px) {
-      #ew-status {
-        top: 78px;
-        right: 8px;
-        gap: 7px;
-      }
+  #ew-status {
+    top: max(8px, env(safe-area-inset-top));
+    right: 8px;
+    gap: 5px;
+  }
 
-      .ew-stat {
-        width: 38px;
-        height: 38px;
-      }
+  .ew-stat {
+    width: 34px;
+    height: 34px;
+  }
 
-      .ew-stat-icon {
-        font-size: 17px;
-      }
-    }
+  .ew-stat-icon {
+    font-size: 15px;
+  }
+}
 
     @media (hover:hover) and (pointer:fine) {
       #ew-controls { display:none; }
