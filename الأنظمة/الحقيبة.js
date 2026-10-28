@@ -770,6 +770,26 @@ export function createInventory(THREE, controls, player) {
       if (existing) {
         existing.quantity += quantity;
       } else {
-        items.push({
-          id: item.id,
-          name: item
+        
+items.push({
+  id: item.id,
+  name: item.name,
+  icon: item.icon || "📦",
+  type: item.type || "resource",
+  quantity,
+  ...(item.slot ? { slot: item.slot } : {}),
+  ...(Number.isFinite(Number(item.defense))
+    ? { defense: Number(item.defense) }
+    : {})
+});
+}
+
+save();
+render();
+return true;
+}
+};
+
+return api;
+}
+
