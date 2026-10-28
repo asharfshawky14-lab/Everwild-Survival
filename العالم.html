@@ -189,7 +189,10 @@ const THREE = await import(
 );
 
 const { createCharacter } = await import("./الشخصية.js");
+
 const { createGameControls } = await import("./الأزرار.js");
+const { createInventory } = await import("./الأنظمة/الحقيبة.js");
+
 
 const واجهة_التحكم = createGameControls();
 
